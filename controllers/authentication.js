@@ -1,66 +1,63 @@
-const authentification = require("../models/authentification");
+const {
+  finduser,
+  finduserbyid,
+  createuserprofile,
+  updateuserpassword,
+} = require("../models/authentification");
 const jsonwebtoken = require("jsonwebtoken");
 const config = require("../configs/config");
 const bcrypt = require("bcrypt");
+
+const errorHandler = (res, errMessage) => {
+  return res.status(404).json({ status: false, message: errMessage });
+};
+
 const signUp = (req, res, next) => {
-  authentification.authentificationModel
-    .finduser(req.body)
+  finduser(req.body)
     .then((userExist) => {
       if (Object.keys(userExist).length > 0) {
-        return res.status(404).json({ status: false, message: "User Exist!" });
+        errorHandler(res, "User Exist!");
       } else {
         var salt = bcrypt.genSaltSync(10);
         var hashpassword = bcrypt.hashSync(req.body.password, salt);
         req.body.password = hashpassword;
-        authentification.authentificationModel
-          .createuserprofile(req.body)
+        createuserprofile(req.body)
           .then((userCreated) => {
             return res
               .status(200)
               .json({ status: true, message: "User Is Created!" });
           })
           .catch((err) => {
-            return res.status(400).json({ status: false, message: err });
+            errorHandler(res, err);
           });
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
-  // return res.status(200).json('AUTH');
 };
+
 const login = (req, res, next) => {
-  authentification.authentificationModel
-    .finduser(req.body)
+  finduser(req.body)
     .then((userExist) => {
       if (!(Object.keys(userExist).length > 0)) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Username Not Found!" });
+        errorHandler(res, "Username Not Found!");
       } else {
         bcrypt.compare(
           req.body.password,
           userExist[0].password,
           function (err, isMatch) {
             if (err) {
-              return res.status(400).json({
-                status: false,
-                message: err,
-              });
+              errorHandler(res, err);
             } else if (!isMatch) {
-              return res.status(404).json({
-                status: false,
-                message: "Password Is Incorrect!",
-              });
+              errorHandler(res, "Password Is Incorrect!");
             } else {
-              const userToken = jsonwebtoken.default.sign(
+              const userToken = jsonwebtoken.sign(
                 { id: userExist[0].id },
-                config.default.TOKEN
+                config.TOKEN
               );
               return res.status(200).json({
+                status: true,
                 token: userToken,
               });
             }
@@ -69,47 +66,40 @@ const login = (req, res, next) => {
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
 };
+
 const me = (req, res, next) => {
-  return res.status(200).json({
-    status: true,
-    message: req.body.userData,
-  });
+  if (!(Object.keys(userExist).length > 0)) {
+    errorHandler(res, "User Not Found!");
+  } else {
+    return res.status(200).json({
+      status: true,
+      message: req.body.userData,
+    });
+  }
 };
+
 const updatePassword = (req, res, next) => {
-  authentification.authentificationModel
-    .finduserbyid(req.body.userData.id)
+  finduserbyid(req.body.userData.id)
     .then((userExist) => {
       if (!(Object.keys(userExist).length > 0)) {
-        return res
-          .status(404)
-          .json({ status: false, message: "User Not Found!" });
+        errorHandler(res, "User Not Found!");
       } else {
         bcrypt.compare(
           req.body.old_password,
           userExist[0].password,
           function (err, isMatch) {
             if (err) {
-              return res.status(400).json({
-                status: false,
-                message: err,
-              });
+              errorHandler(res, err);
             } else if (!isMatch) {
-              return res.status(404).json({
-                status: false,
-                message: "old_password is incorrect",
-              });
+              errorHandler(res, "old_password is incorrect");
             } else {
               var salt = bcrypt.genSaltSync(10);
               var hashpassword = bcrypt.hashSync(req.body.new_password, salt);
               req.body.password = hashpassword;
-              authentification.authentificationModel
-                .updateuserpassword(req.body.userData, req.body.password)
+              updateuserpassword(req.body.userData, req.body.password)
                 .then((result) => {
                   return res.status(200).json({
                     status: true,
@@ -117,10 +107,7 @@ const updatePassword = (req, res, next) => {
                   });
                 })
                 .catch((err) => {
-                  return res.status(400).json({
-                    status: false,
-                    message: err,
-                  });
+                  errorHandler(res, err);
                 });
             }
           }
@@ -128,10 +115,8 @@ const updatePassword = (req, res, next) => {
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
 };
+
 module.exports = { signUp, login, me, updatePassword };

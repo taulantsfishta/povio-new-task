@@ -1,23 +1,32 @@
-const user_1 = require("../models/user");
-const user_2 = require("../schemas/user");
+const {
+  finduserbyid,
+  likesofuser,
+  checkiflikeExist,
+  likeauser,
+  unlikeauser,
+  finduserlike,
+} = require("../models/user");
+const userschema = require("../schemas/user");
+
+const errorHandler = (res, errMessage) => {
+  return res.status(404).json({ status: false, message: errMessage });
+};
+
 const userLikesAndUsername = (req, res, next) => {
-  user_1.userModel
-    .finduserbyid(req.params.id)
+  finduserbyid(req.params.id)
     .then((userExist) => {
       if (!(Object.keys(userExist).length > 0)) {
-        return res
-          .status(404)
-          .json({ status: false, message: "User Not Found!" });
+        errorHandler(res, "User Not Found!");
       } else {
-        user_1.userModel
-          .likesofuser(req.params.id)
+        likesofuser(req.params.id)
           .then((likes) => {
             if (!(Object.keys(likes).length > 0)) {
+              let userLikesSchema = userschema.userLikes(userExist[0], 0);
               return res
-                .status(404)
-                .json({ status: false, message: "Like Not Found!" });
+                .status(200)
+                .json({ status: true, message: userLikesSchema });
             } else {
-              let userLikesSchema = user_2.default.userLikes(
+              let userLikesSchema = userschema.userLikes(
                 userExist[0],
                 likes.length
               );
@@ -27,39 +36,27 @@ const userLikesAndUsername = (req, res, next) => {
             }
           })
           .catch((err) => {
-            return res.status(400).json({
-              status: false,
-              message: err,
-            });
+            errorHandler(res, err);
           });
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
 };
+
 const likeAUser = (req, res, next) => {
-  user_1.userModel
-    .finduserbyid(req.params.id)
+  finduserbyid(req.params.id)
     .then((userExist) => {
       if (!(Object.keys(userExist).length > 0)) {
-        return res
-          .status(404)
-          .json({ status: false, message: "User Not Found!" });
+        errorHandler(res, "User Not Found!");
       } else {
-        user_1.userModel
-          .checkiflikeExist(req.body.userData.id, req.params.id)
+        checkiflikeExist(req.body.userData.id, req.params.id)
           .then((likeExist) => {
             if (Object.keys(likeExist).length > 0) {
-              return res
-                .status(404)
-                .json({ status: false, message: "Like Exist!" });
+              errorHandler(res, "Like Exist!");
             } else {
-              user_1.userModel
-                .likeauser(req.body.userData.id, req.params.id)
+              likeauser(req.body.userData.id, req.params.id)
                 .then((result) => {
                   return res.status(200).json({
                     status: true,
@@ -67,47 +64,32 @@ const likeAUser = (req, res, next) => {
                   });
                 })
                 .catch((err) => {
-                  return res.status(400).json({
-                    status: false,
-                    message: err,
-                  });
+                  errorHandler(res, err);
                 });
             }
           })
           .catch((err) => {
-            return res.status(400).json({
-              status: false,
-              message: err,
-            });
+            errorHandler(res, err);
           });
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
 };
+
 const unLikeAUser = (req, res, next) => {
-  user_1.userModel
-    .finduserbyid(req.params.id)
+  finduserbyid(req.params.id)
     .then((userExist) => {
       if (!(Object.keys(userExist).length > 0)) {
-        return res
-          .status(404)
-          .json({ status: false, message: "User Not Found!" });
+        errorHandler(res, "User Not Found!");
       } else {
-        user_1.userModel
-          .checkiflikeExist(req.body.userData.id, req.params.id)
+        checkiflikeExist(req.body.userData.id, req.params.id)
           .then((likeExist) => {
             if (!(Object.keys(likeExist).length > 0)) {
-              return res
-                .status(404)
-                .json({ status: false, message: "Like Doesn't Exist!" });
+              errorHandler(res, "Like Doesn't Exist!");
             } else {
-              user_1.userModel
-                .unlikeauser(req.body.userData.id, req.params.id)
+              unlikeauser(req.body.userData.id, req.params.id)
                 .then((result) => {
                   return res.status(200).json({
                     status: true,
@@ -115,51 +97,38 @@ const unLikeAUser = (req, res, next) => {
                   });
                 })
                 .catch((err) => {
-                  return res.status(400).json({
-                    status: false,
-                    message: err,
-                  });
+                  errorHandler(res, err);
                 });
             }
           })
           .catch((err) => {
-            return res.status(400).json({
-              status: false,
-              message: err,
-            });
+            errorHandler(res, err);
           });
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
 };
+
 const getMostLikedUsers = (req, res, next) => {
-  user_1.userModel
-    .finduserlike()
+  finduserlike()
     .then((userLike) => {
       if (!(Object.keys(userLike).length > 0)) {
-        return res
-          .status(404)
-          .json({ status: false, message: "No Like Found" });
+        errorHandler(res, "No Like Found");
       } else {
         let userNumberLikesSchema = new Array();
         userLike.forEach((element) => {
-          userNumberLikesSchema.push(user_2.default.userNumberOfLikes(element));
+          userNumberLikesSchema.push(userschema.userNumberOfLikes(element));
         });
         return res.json({ status: true, message: userNumberLikesSchema });
       }
     })
     .catch((err) => {
-      return res.status(400).json({
-        status: false,
-        message: err,
-      });
+      errorHandler(res, err);
     });
 };
+
 module.exports = {
   userLikesAndUsername,
   likeAUser,

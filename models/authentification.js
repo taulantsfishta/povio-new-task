@@ -4,7 +4,7 @@ var updatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 module.exports = {
   finduser: (userData) => {
     return new Promise((resolve, reject) => {
-      db.default.query(
+      db.query(
         "SELECT * FROM user WHERE name= ?",
         [userData.name],
         (error, results) => {
@@ -18,21 +18,17 @@ module.exports = {
   },
   finduserbyid: (id) => {
     return new Promise((resolve, reject) => {
-      db.default.query(
-        "SELECT * FROM user WHERE id= ?",
-        [id],
-        (error, results) => {
-          if (error) {
-            return reject(error);
-          }
-          return resolve(results);
+      db.query("SELECT * FROM user WHERE id= ?", [id], (error, results) => {
+        if (error) {
+          return reject(error);
         }
-      );
+        return resolve(results);
+      });
     });
   },
   createuserprofile: (userData) => {
     return new Promise((resolve, reject) => {
-      db.default.query(
+      db.query(
         "INSERT INTO user (name,password,created_at,updated_at) VALUES(?,?,?,?)",
         [userData.name, userData.password, createdAt, updatedAt],
         (error, results) => {
@@ -46,7 +42,7 @@ module.exports = {
   },
   updateuserpassword: (userData, newPassword) => {
     return new Promise((resolve, reject) => {
-      db.default.query(
+      db.query(
         "UPDATE user SET password= ?,updated_at = ? WHERE id = ?",
         [newPassword, updatedAt, userData.id],
         (error, results) => {

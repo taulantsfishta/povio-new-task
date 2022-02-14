@@ -4,8 +4,8 @@
   "description": "Test Task For Povio Company In Pristina",
   "main": "server.js",
   "scripts": {
-    "test": "server.js",
-    "start": "nodemon server.js"
+    "test": "NODE_ENV=test jest --forceExit",
+    "start": "nodemon"
   },
   "repository": {
     "type": "git",
@@ -26,5 +26,9 @@
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "supertest": "^6.2.2"
   }
 }

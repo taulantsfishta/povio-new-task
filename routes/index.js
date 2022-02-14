@@ -13,11 +13,12 @@ const router = express.Router();
 // // @desc         Welcome
 // // @route        GET  /
 router.get("/", (req, res) => {
-  res.status(200).json("WELCOME");
+  res.status(200).json("WELCOME TO POVIO TASK");
 });
+
 // // @desc         Auth
 // // @route        POST  /signup
-router.post("/signup", validateauth, authenticationController.signUp);
+router.post("/signup", signup(), validateauth, authenticationController.signUp);
 // @route        POST  /login
 router.post("/login", authenticationController.login);
 // // @route        GET  /me

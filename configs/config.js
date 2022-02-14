@@ -1,12 +1,13 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const config = {
-  SERVER_HOSTNAME: process.env.SERVER_HOSTNAME || "localhost",
-  SERVER_PORT: process.env.SERVER_PORT || 3000,
-  DB_PORT: 8080,
-  DB_HOST: "localhost",
-  DB_USER: "root",
-  MYSQL_DB: "povio-database",
-  TOKEN: "SHQIPNIETNIKE--",
+  HOST: process.env.DB_HOST || "127.0.0.1",
+  USER: process.env.DB_USER || "root",
+  PASSWORD: process.env.DB_PASSWORD || "123456",
+  DB: process.env.DB_NAME || "povio_db",
+  port: process.env.DB_PORT || "3307",
+  dialect: "mysql",
+  TOKEN: "shqiprietnike--",
 };
+
 module.exports = config;

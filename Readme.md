@@ -5,7 +5,8 @@ The project is build in Docker so all what it need it just on terminal to type:
 
 With this two commands we will enable to run the server also all the schemas on mysql database will be run.
 
----
+The github link for povio repository is : https://github.com/taulantsfishta/povio-new-task
+---------------------------------------------------------------------------------------------------------------------------------------------------
 
 Question: Argument your database choice in the Readme.md file - why relational/noSQL, why a postgres/mysql etc.
 
